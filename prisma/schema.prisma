@@ -1,0 +1,377 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  COMPANY_ADMIN
+  HR_MANAGER
+  DEPARTMENT_MANAGER
+  EMPLOYEE
+}
+
+enum PlanType {
+  FREE
+  STARTER
+  BUSINESS
+  ENTERPRISE
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  EXPIRED
+  TRIALING
+}
+
+enum CompanyStatus {
+  ACTIVE
+  INACTIVE
+  CLOSED
+}
+
+enum EmployeeStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  LATE
+  HALF_DAY
+  LEAVE
+  HOLIDAY
+}
+
+enum LeaveStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+enum LeaveType {
+  SICK
+  ANNUAL
+  PERSONAL
+  MATERNITY
+  PATERNITY
+  OTHER
+}
+
+enum BreakType {
+  LUNCH
+  BREAK
+  OTHER
+}
+
+model Company {
+  id             String         @id @default(cuid())
+  name           String
+  slug           String         @unique
+  email          String?
+  phone          String?
+  address        String?
+  logo           String?
+  website        String?
+  size           Int            @default(0)
+  status         CompanyStatus  @default(ACTIVE)
+  lastActivityAt DateTime?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  planId        String?
+  plan          Plan?              @relation(fields: [planId], references: [id])
+  subscription  Subscription?
+  users         User[]
+  departments  Department[]
+  branches     Branch[]
+  employees    Employee[]
+  shifts       Shift[]
+  attendance   Attendance[]
+  leaveRequests LeaveRequest[]
+
+  @@index([slug])
+  @@index([planId])
+}
+
+model Plan {
+  id             String   @id @default(cuid())
+  name           PlanType @unique @default(FREE)
+  displayName    String
+  description    String?
+  price          Int
+  currency       String   @default("usd")
+  interval       String   @default("month")
+  stripePriceId    String?
+  paystackPlanCode String?
+  maxEmployees     Int      @default(5)
+  maxBranches    Int      @default(1)
+  maxDepartments Int      @default(5)
+  qrAttendance   Boolean  @default(false)
+  gpsAttendance  Boolean  @default(false)
+  aiFeatures     Boolean  @default(false)
+  apiAccess      Boolean  @default(false)
+  prioritySupport Boolean @default(false)
+  reports        Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  companies Company[]
+  subscriptions Subscription[]
+
+  @@index([name])
+}
+
+model Subscription {
+  id             String             @id @default(cuid())
+  companyId      String             @unique
+  company        Company            @relation(fields: [companyId], references: [id])
+  planId         String
+  plan           Plan               @relation(fields: [planId], references: [id])
+  status         SubscriptionStatus @default(ACTIVE)
+  stripeCustomerId     String?
+  stripeSubscriptionId String?
+  paystackCustomerId     String?
+  paystackSubscriptionId String?
+  authorizationUrl      String?
+  currentPeriodStart  DateTime?
+  currentPeriodEnd   DateTime?
+  trialEnd       DateTime?
+  cancelAtPeriodEnd Boolean          @default(false)
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+
+  @@index([companyId])
+  @@index([planId])
+  @@index([status])
+}
+
+model User {
+  id             String   @id @default(cuid())
+  email          String   @unique
+  passwordHash   String
+  firstName      String
+  lastName       String
+  role           UserRole @default(EMPLOYEE)
+  isActive       Boolean  @default(true)
+  companyId      String
+  company        Company  @relation(fields: [companyId], references: [id])
+  employeeId     String?   @unique
+  employee       Employee? @relation(fields: [employeeId], references: [id])
+  resetToken     String?   @unique
+  resetTokenExpiry DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([email])
+  @@index([companyId])
+  @@index([role])
+}
+
+model Department {
+  id        String   @id @default(cuid())
+  name      String
+  description String?
+  companyId String
+  company   Company  @relation(fields: [companyId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  employees Employee[]
+
+  @@unique([companyId, name])
+  @@index([companyId])
+}
+
+model Branch {
+  id        String   @id @default(cuid())
+  name      String
+  address   String?
+  phone     String?
+  email     String?
+  latitude  Float?
+  longitude Float?
+  radius    Int      @default(100)
+  isActive  Boolean  @default(true)
+  companyId String
+  company   Company  @relation(fields: [companyId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  employees Employee[]
+  shifts    Shift[]
+
+  @@unique([companyId, name])
+  @@index([companyId])
+}
+
+model Employee {
+  id           String         @id @default(cuid())
+  employeeCode String
+  firstName    String
+  lastName     String
+  email        String?
+  phone        String?
+  position     String?
+  salary       Float?
+  hireDate     DateTime?
+  status       EmployeeStatus @default(ACTIVE)
+  companyId    String
+  company      Company        @relation(fields: [companyId], references: [id])
+  departmentId String?
+  department   Department?    @relation(fields: [departmentId], references: [id])
+  branchId     String?
+  branch       Branch?        @relation(fields: [branchId], references: [id])
+  shiftId      String?
+  shift        Shift?         @relation(fields: [shiftId], references: [id])
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  user      User?
+  attendance Attendance[]
+  leaveRequests LeaveRequest[]
+
+  @@unique([companyId, employeeCode])
+  @@index([companyId])
+  @@index([departmentId])
+  @@index([branchId])
+  @@index([status])
+}
+
+model Shift {
+  id        String   @id @default(cuid())
+  name      String
+  startTime String
+  endTime   String
+  graceTime Int      @default(15)
+  workingHours Float?
+  companyId String
+  company   Company  @relation(fields: [companyId], references: [id])
+  branchId  String?
+  branch    Branch?  @relation(fields: [branchId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  employees Employee[]
+  attendance Attendance[]
+
+  @@unique([companyId, name])
+  @@index([companyId])
+}
+
+model Attendance {
+  id             String           @id @default(cuid())
+  date           DateTime
+  clockIn        DateTime?
+  clockOut       DateTime?
+  totalHours     Float?
+  lateMinutes    Int              @default(0)
+  status         AttendanceStatus @default(PRESENT)
+  note           String?
+  earlyClockoutReason String?
+  latitude       Float?
+  longitude      Float?
+  qrToken        String?
+  companyId      String
+  company        Company          @relation(fields: [companyId], references: [id])
+  employeeId     String
+  employee       Employee         @relation(fields: [employeeId], references: [id])
+  shiftId        String?
+  shift          Shift?           @relation(fields: [shiftId], references: [id])
+  breaks         Break[]
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  @@unique([employeeId, date])
+  @@index([companyId])
+  @@index([employeeId])
+  @@index([date])
+  @@index([status])
+}
+
+model Break {
+  id           String    @id @default(cuid())
+  startTime    DateTime
+  endTime      DateTime?
+  duration     Int       @default(0)
+  type         BreakType @default(LUNCH)
+  attendanceId String
+  attendance   Attendance @relation(fields: [attendanceId], references: [id])
+  createdAt    DateTime  @default(now())
+
+  @@index([attendanceId])
+}
+
+model LeaveRequest {
+  id         String     @id @default(cuid())
+  type       LeaveType
+  startDate  DateTime
+  endDate    DateTime
+  reason     String?
+  status     LeaveStatus @default(PENDING)
+  approvedBy String?
+  companyId  String
+  company    Company    @relation(fields: [companyId], references: [id])
+  employeeId String
+  employee   Employee   @relation(fields: [employeeId], references: [id])
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  @@index([companyId])
+  @@index([employeeId])
+  @@index([status])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  action    String
+  entity    String
+  entityId  String?
+  details   Json?
+  userId    String?
+  companyId String
+  createdAt DateTime @default(now())
+
+  @@index([companyId])
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model ApiKey {
+  id        String   @id @default(cuid())
+  name      String
+  key       String   @unique
+  active    Boolean  @default(true)
+  companyId String
+  createdAt DateTime @default(now())
+  expiresAt DateTime?
+
+  @@index([companyId])
+  @@index([key])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  type      String
+  title     String
+  message   String
+  link      String?
+  read      Boolean  @default(false)
+  companyId String
+  userId    String?
+  role      String?
+  entityId  String?
+  createdAt DateTime @default(now())
+
+  @@index([companyId, userId, read])
+  @@index([companyId, role, read])
+  @@index([createdAt])
+}
