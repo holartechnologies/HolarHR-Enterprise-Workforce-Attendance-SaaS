@@ -49,3 +49,5 @@ public/uploads/*
 prisma/dev.db
 *.db
 *.db-journal
+
+.vercel
