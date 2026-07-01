@@ -100,6 +100,7 @@ model Company {
    leaveRequests LeaveRequest[]
    devices      BiometricDevice[]
    employeeDevices EmployeeDevice[]
+   employeeCredentials EmployeeCredential[]
 
   @@index([slug])
   @@index([planId])

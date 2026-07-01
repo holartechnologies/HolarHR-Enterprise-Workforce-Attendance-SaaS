@@ -16,11 +16,13 @@ export async function POST(req: Request) {
     if (!user.employeeId) return badRequest("No employee linked");
 
     const body = await req.json();
-    const { response } = body;
+    const { response, challenge } = body;
     if (!response) return badRequest("Missing response");
+    if (!challenge) return badRequest("Missing challenge");
 
     const verification = await verifyRegistrationResponse({
       response,
+      expectedChallenge: challenge,
       expectedRPID: rpID,
       expectedOrigin: origin,
     });
@@ -29,16 +31,17 @@ export async function POST(req: Request) {
       return badRequest("Fingerprint verification failed");
     }
 
-    const { credential } = verification.registrationInfo;
+    const { registrationInfo } = verification;
+    const credentialId = Buffer.from(registrationInfo.credentialID).toString("base64url");
 
     await prisma.employeeCredential.create({
       data: {
-        id: credential.id,
-        publicKey: Buffer.from(credential.publicKey),
-        counter: credential.counter,
-        deviceType: credential.deviceType,
-        backedUp: credential.backedUp ?? false,
-        transports: credential.transports ?? [],
+        id: credentialId,
+        publicKey: Buffer.from(registrationInfo.credentialPublicKey),
+        counter: registrationInfo.counter,
+        deviceType: registrationInfo.credentialDeviceType,
+        backedUp: registrationInfo.credentialBackedUp ?? false,
+        transports: body.response?.transports ?? [],
         employeeId: user.employeeId,
         companyId: user.companyId,
       },

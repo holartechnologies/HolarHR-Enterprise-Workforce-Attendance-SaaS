@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { getSessionUser, unauthorized, ok, badRequest, serverError } from "@/lib/api-utils";
 import { hasPermission } from "@/lib/rbac";
 import { hasFeature } from "@/lib/plans";
-import type { AuthenticatorTransport } from "@simplewebauthn/server";
+import type { AuthenticatorTransportFuture } from "@simplewebauthn/types";
 import { generateAuthenticationOptions, verifyAuthenticationResponse } from "@simplewebauthn/server";
 import { startOfDay, endOfDay } from "date-fns";
 import { createAuditLog } from "@/lib/audit";
@@ -36,7 +36,7 @@ export async function GET() {
     const options = await generateAuthenticationOptions({
       rpID,
       allowCredentials: credentials.map((c) => ({
-        id: c.id,
+        id: new Uint8Array(Buffer.from(c.id, "base64url")),
         type: "public-key" as const,
       })),
     });
@@ -77,11 +77,11 @@ export async function POST(req: Request) {
       expectedChallenge: challenge,
       expectedRPID: rpID,
       expectedOrigin: origin,
-      credential: {
-        id: credential.id,
-        publicKey: new Uint8Array(credential.publicKey),
+      authenticator: {
+        credentialID: new Uint8Array(Buffer.from(credential.id, "base64url")),
+        credentialPublicKey: new Uint8Array(credential.publicKey),
         counter: Number(credential.counter),
-        transports: credential.transports as AuthenticatorTransport[],
+        transports: credential.transports as AuthenticatorTransportFuture[],
       },
     });
 

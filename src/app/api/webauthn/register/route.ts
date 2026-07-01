@@ -41,8 +41,8 @@ export async function GET() {
       userID: user.employeeId,
       userName: user.email,
       attestationType: "none",
-      excludeCredentials: existingIds.map((id) => ({
-        id,
+      excludeCredentials: existingIds.map((credId) => ({
+        id: new Uint8Array(Buffer.from(credId, "base64url")),
         type: "public-key" as const,
       })),
     });

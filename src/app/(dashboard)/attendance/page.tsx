@@ -89,13 +89,15 @@ export default function AttendancePage() {
       const regData = await regRes.json();
       if (!regData.success) { toast.error(regData.error); return; }
 
+      const challenge = regData.data.options.challenge;
+
       const { startRegistration } = await import("@simplewebauthn/browser");
-      const regResponse = await startRegistration({ optionsJSON: regData.data.options });
+      const regResponse = await startRegistration(regData.data.options);
 
       const verifyRes = await fetch("/api/webauthn/register/verify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ response: regResponse }),
+        body: JSON.stringify({ response: regResponse, challenge }),
       });
       const verifyData = await verifyRes.json();
       if (verifyData.success) {
@@ -118,7 +120,7 @@ export default function AttendancePage() {
       const challenge = optsData.data.options.challenge;
 
       const { startAuthentication } = await import("@simplewebauthn/browser");
-      const authResponse = await startAuthentication({ optionsJSON: optsData.data.options });
+      const authResponse = await startAuthentication(optsData.data.options);
 
       const coords = await getLocation();
       const verifyRes = await fetch("/api/attendance/mobile-fingerprint", {
@@ -157,7 +159,7 @@ export default function AttendancePage() {
       const desiredType = clockedIn ? "clock_out" : "clock_in";
 
       const { startAuthentication } = await import("@simplewebauthn/browser");
-      const authResponse = await startAuthentication({ optionsJSON: optsData.data.options });
+      const authResponse = await startAuthentication(optsData.data.options);
 
       const coords = await getLocation();
       const verifyRes = await fetch("/api/attendance/mobile-fingerprint", {
