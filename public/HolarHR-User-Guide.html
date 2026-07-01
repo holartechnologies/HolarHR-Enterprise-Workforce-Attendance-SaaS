@@ -110,8 +110,10 @@ insights, and billing integration with Stripe &amp; Paystack.
     <tr><td>Max Employees</td><td>3</td><td>25</td><td>250</td><td>99,999</td></tr>
     <tr><td>Max Branches</td><td>1</td><td>2</td><td>10</td><td>999</td></tr>
     <tr><td>Max Departments</td><td>5</td><td>10</td><td>25</td><td>999</td></tr>
+    <tr><td>Biometric Devices</td><td>0</td><td>0</td><td>5</td><td>99</td></tr>
     <tr><td>QR Attendance</td><td>—</td><td>—</td><td>✓</td><td>✓</td></tr>
     <tr><td>GPS Attendance</td><td>—</td><td>—</td><td>✓</td><td>✓</td></tr>
+    <tr><td>Mobile Fingerprint</td><td>—</td><td>—</td><td>✓</td><td>✓</td></tr>
     <tr><td>AI Insights</td><td>—</td><td>—</td><td>—</td><td>✓</td></tr>
     <tr><td>API Access</td><td>—</td><td>—</td><td>✓</td><td>✓</td></tr>
     <tr><td>Priority Support</td><td>—</td><td>—</td><td>—</td><td>✓</td></tr>
@@ -138,6 +140,21 @@ insights, and billing integration with Stripe &amp; Paystack.
     Clock in / clock out with late detection, shift-based calculations, early clock-out reason required. Daily unique constraint per employee.
   </div>
   <div class="feature-item">
+    <strong>GPS Geofenced Attendance</strong>
+    <span class="tag tag-business">Business+</span>
+    Browser geolocation on clock-in/out validates the employee is within a configurable grace zone (default 10m, adjustable in Settings). Uses Haversine distance calculation.
+  </div>
+  <div class="feature-item">
+    <strong>Mobile Fingerprint (WebAuthn)</strong>
+    <span class="tag tag-business">Business+</span>
+    Register your device's fingerprint/face unlock via WebAuthn API and clock in/out with a single tap. Works on any device with biometric sensor — no external hardware needed.
+  </div>
+  <div class="feature-item">
+    <strong>Biometric Devices</strong>
+    <span class="tag tag-business">Business+</span>
+    Manage physical fingerprint scanners (e.g., ZKTeco). Add devices, enroll employees, import attendance from devices. Plan limits: Business 5, Enterprise 99.
+  </div>
+  <div class="feature-item">
     <strong>Break Management</strong>
     Track lunch and other breaks during the workday. Duration auto-calculated.
   </div>
@@ -160,11 +177,19 @@ insights, and billing integration with Stripe &amp; Paystack.
   </div>
   <div class="feature-item">
     <strong>Departments &amp; Branches</strong>
-    Organize your workforce by department (Engineering, HR, Marketing, etc.) and branch (HQ, remote offices).
+    Organize your workforce by department (Engineering, HR, Marketing, etc.) and branch (HQ, remote offices). Branches support GPS coordinates for geofencing and are editable/deletable inline (deletion blocked if employees assigned).
   </div>
   <div class="feature-item">
     <strong>Employee Management</strong>
-    Full CRUD with plan limit enforcement, search, filtering. Employee creation auto-generates a user account with a temporary password.
+    Full CRUD with plan limit enforcement, search, filtering. Employee creation auto-generates a user account with a temporary password. Assign employees to a Branch and Shift directly from the add/edit form. View device enrollment count per employee.
+  </div>
+  <div class="feature-item">
+    <strong>Branch GPS Coordinates</strong>
+    Set latitude/longitude per branch via the inline edit form or "Use My Location" button. Used as the anchor point for GPS geofence validation on clock-in.
+  </div>
+  <div class="feature-item">
+    <strong>Settings — GPS Grace Zone</strong>
+    Configure per-tenant GPS grace zone distance (in meters) from the branch's GPS coordinates. Employees must be within this radius to clock in/out. Accessible from the Settings page.
   </div>
   <div class="feature-item">
     <strong>Notifications</strong>
@@ -184,7 +209,7 @@ insights, and billing integration with Stripe &amp; Paystack.
   </div>
   <div class="feature-item">
     <strong>Company Settings</strong>
-    Company profile, logo upload (max 400KB, PNG/JPG/SVG), plan management.
+    Company profile, logo upload (stored as base64 in DB — no filesystem), GPS grace zone configuration, plan management.
   </div>
   <div class="feature-item">
     <strong>Profile Page</strong>
@@ -246,7 +271,7 @@ insights, and billing integration with Stripe &amp; Paystack.
   </li>
   <li>
     <strong>Complete Your Company Profile</strong><br>
-    Navigate to <strong>Settings</strong> → update company name, email, phone, address.
+    Navigate to <strong>Settings</strong> → update company name, email, phone, address, and GPS grace zone distance.
     Upload your company logo (PNG/JPG/SVG, max 400KB).
   </li>
   <li>
@@ -255,9 +280,10 @@ insights, and billing integration with Stripe &amp; Paystack.
     Create departments like Engineering, Human Resources, Marketing, Sales, etc.
   </li>
   <li>
-    <strong>Create Branches</strong><br>
+    <strong>Create Branches (with GPS)</strong><br>
     Go to <strong>Branches</strong> → click <strong>Add Branch</strong>.
-    Add your office locations (Headquarters, Branch Office, etc.).
+    Add your office locations with GPS coordinates (latitude/longitude). Use the <strong>Use My Location</strong> button to auto-fill from your current position.
+    Branches can be edited inline or deleted (deletion blocked if employees are assigned).
   </li>
   <li>
     <strong>Define Shifts</strong><br>
@@ -269,14 +295,31 @@ insights, and billing integration with Stripe &amp; Paystack.
     <strong>Add Employees</strong><br>
     Go to <strong>Employees</strong> → click <strong>Add Employee</strong>.
     Fill in employee details (first name, last name, email, phone, position, salary).
-    Assign them to a Department, Branch, and Shift.
-    A user account is automatically created with a temporary password.
+    Assign them to a Department, Branch, and Shift via dropdowns.
+    View device enrollment count per employee. A user account is automatically created with a temporary password.
+    HR/Admin can reset an employee's password from the row actions menu.
   </li>
   <li>
-    <strong>Manage Attendance</strong><br>
+    <strong>Manage Attendance (with GPS)</strong><br>
     Go to <strong>Attendance</strong> → click <strong>Clock In</strong> to start tracking.
+    Your browser will ask for location permission — this validates you are within the GPS grace zone of your assigned branch.
     Use <strong>Clock Out</strong> at the end of the day (early clock-out requires a reason).
+    Use <strong>Start Break</strong> / <strong>End Break</strong> to track breaks.
     View attendance status (Present, Late, Absent, Half-day, Leave) in the dashboard.
+  </li>
+  <li>
+    <strong>Use Mobile Fingerprint Clock-In</strong>
+    <span class="tag tag-business">Business+</span><br>
+    Go to <strong>Attendance</strong> → in the <strong>Today's Activity</strong> card, tap <strong>Register</strong> next to "Mobile Fingerprint".
+    Your device will prompt you to scan your fingerprint or face. Once registered, use the <strong>Fingerprint Clock-In</strong> / <strong>Fingerprint Clock-Out</strong> button to record attendance with a single biometric tap — no manual clock-in needed.
+    You can register multiple devices (e.g., phone + tablet) by tapping <strong>Add Device</strong>.
+  </li>
+  <li>
+    <strong>Manage Biometric Devices</strong>
+    <span class="tag tag-business">Business+</span><br>
+    Go to <strong>Devices</strong> → click <strong>Add Device</strong> to register a physical fingerprint scanner (name, serial number, IP address, location).
+    From the Employees page, edit an employee and use the <strong>Enroll on device</strong> dropdown to link them to a device.
+    Attendance can be imported from devices via the API at <code>/api/attendance/device</code>.
   </li>
   <li>
     <strong>Submit &amp; Approve Leave</strong><br>
@@ -355,12 +398,13 @@ insights, and billing integration with Stripe &amp; Paystack.
     <tr><td>Register</td><td><code>/register</code></td><td>Create a new company account</td></tr>
     <tr><td>Forgot Password</td><td><code>/forgot-password</code></td><td>Request password reset link</td></tr>
     <tr><td>Dashboard</td><td><code>/dashboard</code></td><td>Main overview with attendance summary</td></tr>
-    <tr><td>Attendance</td><td><code>/attendance</code></td><td>Clock in/out, view attendance history</td></tr>
+    <tr><td>Attendance</td><td><code>/attendance</code></td><td>Clock in/out (manual &amp; fingerprint), view history</td></tr>
     <tr><td>Attendance Status</td><td><code>/attendance/status</code></td><td>Today's attendance status</td></tr>
-    <tr><td>Employees</td><td><code>/employees</code></td><td>Manage employees (HR+)</td></tr>
+    <tr><td>Employees</td><td><code>/employees</code></td><td>Manage employees (HR+) — includes branch/shift assignment and device enrollment</td></tr>
     <tr><td>Departments</td><td><code>/departments</code></td><td>Manage departments (HR+)</td></tr>
-    <tr><td>Branches</td><td><code>/branches</code></td><td>Manage branches (HR+)</td></tr>
+    <tr><td>Branches</td><td><code>/branches</code></td><td>Manage branches (HR+) — GPS coords, inline edit/delete</td></tr>
     <tr><td>Shifts</td><td><code>/shifts</code></td><td>Manage shifts (HR+)</td></tr>
+    <tr><td>Devices</td><td><code>/devices</code></td><td>Manage biometric devices (MANAGER+) — add, edit, delete</td></tr>
     <tr><td>Leave</td><td><code>/leave</code></td><td>Submit and manage leave requests</td></tr>
     <tr><td>Reports</td><td><code>/reports</code></td><td>Attendance reports and summaries</td></tr>
     <tr><td>AI Insights</td><td><code>/ai</code></td><td>AI-powered HR chat (Enterprise)</td></tr>
@@ -401,6 +445,38 @@ insights, and billing integration with Stripe &amp; Paystack.
     An employee can have at most one attendance record per day (enforced by unique constraint on
     <code>employeeId + date</code>). Clocking out early requires a mandatory reason.
     Late arrival is calculated against the assigned shift's start time plus grace period.
+  </p>
+</div>
+
+<div class="card">
+  <h3>GPS Geofence</h3>
+  <p>
+    When a branch has GPS coordinates set, clock-in/out requests include the employee's browser geolocation.
+    The Haversine distance between the employee's location and the branch's coordinates is calculated.
+    If the distance exceeds the company's <strong>GPS Grace Zone</strong> (set in Settings, default 10m),
+    the clock-in/out is rejected. This ensures employees are physically present at the office.
+  </p>
+</div>
+
+<div class="card">
+  <h3>Mobile Fingerprint (WebAuthn)</h3>
+  <p>
+    Uses the WebAuthn (Web Authentication) standard to register and verify biometric credentials
+    (fingerprint, Face ID, Windows Hello) directly in the browser. No external hardware, SDKs, or
+    third-party services needed. Credentials are stored per-employee, and each credential has a
+    monotonically increasing counter to detect cloned authenticators. Available on Business+ plans.
+    Employees register from the <strong>Attendance</strong> page and can add multiple devices.
+  </p>
+</div>
+
+<div class="card">
+  <h3>Biometric Devices (Physical Scanners)</h3>
+  <p>
+    For organizations using physical fingerprint scanners (e.g., ZKTeco), HolarHR provides a
+    <strong>Devices</strong> management page. Devices are tracked by name, serial number, IP, and location.
+    Employees can be enrolled on multiple devices via the employee edit form. Attendance data can be
+    imported from devices through the <code>/api/attendance/device</code> API endpoint.
+    Plan limits: 5 devices on Business, 99 on Enterprise.
   </p>
 </div>
 
