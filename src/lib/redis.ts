@@ -12,7 +12,10 @@ export const redis = globalForRedis.redis ?? new Redis(redisUrl, {
     if (times > 3) return null;
     return Math.min(times * 200, 2000);
   },
+  lazyConnect: true,
 });
+
+redis.on("error", () => {});
 
 if (process.env.NODE_ENV !== "production") globalForRedis.redis = redis;
 
