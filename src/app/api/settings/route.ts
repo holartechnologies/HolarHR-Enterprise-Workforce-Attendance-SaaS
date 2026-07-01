@@ -30,7 +30,7 @@ export async function PATCH(req: NextRequest) {
     if (!hasPermission(user.role, "settings:manage")) return unauthorized();
 
     const body = await req.json();
-    const { name, email, phone, address, website, logo } = body;
+    const { name, email, phone, address, website, logo, gpsGraceZone } = body;
 
     const company = await prisma.company.update({
       where: { id: user.companyId },
@@ -41,6 +41,7 @@ export async function PATCH(req: NextRequest) {
         ...(address !== undefined && { address }),
         ...(website !== undefined && { website }),
         ...(logo !== undefined && { logo }),
+        ...(gpsGraceZone !== undefined && { gpsGraceZone }),
       },
     });
 

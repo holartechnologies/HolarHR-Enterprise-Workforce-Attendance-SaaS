@@ -81,6 +81,8 @@ export interface PlanLimits {
   maxDepartments: number;
   qrAttendance: boolean;
   gpsAttendance: boolean;
+  mobileFingerprint: boolean;
+  biometricDevices: number;
   aiFeatures: boolean;
   apiAccess: boolean;
   prioritySupport: boolean;

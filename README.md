@@ -1,6 +1,7 @@
-# HolarHR-Enterprise-Attendance
+# HolarHR — Enterprise Workforce Attendance SaaS
+https://holarhrattendance.vercel.app/HolarHR-User-Guide.pdf
 
-Enterprise-grade multi-tenant attendance tracking, employee management, and HR platform built with Next.js 16 (App Router), Tailwind CSS v4, Prisma 7, and NextAuth v5.
+Multi-tenant attendance tracking, employee management, and HR platform built with Next.js 16 (App Router), Tailwind CSS v4, Prisma 7, and NextAuth v5.
 
 ## Quick Start
 
@@ -16,7 +17,6 @@ Open [http://localhost:3000](http://localhost:3000).
 
 > Redis errors on build are harmless — the app works without a Redis server. Caching/queues degrade gracefully.
 
-## Test Accounts
 
 | Email | Password | Plan | Role |
 |---|---|---|---|
@@ -25,14 +25,6 @@ Open [http://localhost:3000](http://localhost:3000).
 | starter@test.com | password123 | Starter | COMPANY_ADMIN |
 | business@test.com | password123 | Business | COMPANY_ADMIN |
 | enterprise@test.com | password123 | Enterprise | COMPANY_ADMIN |
-
-## Password Reset Flow
-
-1. User clicks **"Forgot password?"** on the login page
-2. Enters their email at `/forgot-password` → `POST /api/auth/forgot-password` generates a crypto reset token (1hr expiry) stored on the User record
-3. The reset link is logged to the server console (no email sending configured for local dev)
-4. User opens `/reset-password?token=xxx`, enters a new password → `POST /api/auth/reset-password` validates token, hashes the new password, clears the token
-5. User signs in with the new password
 
 ## Employee Login Flow
 
@@ -68,10 +60,11 @@ Employees only see pages they have permission for (attendance, reports, leave).
 ```
 src/
 ├── app/
-│   ├── (auth)/             # Auth pages (login, register, forgot/reset password)
 │   ├── (dashboard)/        # Authenticated pages (attendance, employees, etc.)
 │   ├── admin/              # SUPER_ADMIN panel (tenants, users, stats)
 │   ├── api/                # REST API routes
+│   ├── login/              # Login page
+│   ├── register/           # Registration page
 │   └── page.tsx            # Landing page
 ├── auth.ts                 # NextAuth configuration
 ├── middleware.ts           # Auth + admin route protection
@@ -95,8 +88,6 @@ src/
 |---|---|---|
 | POST | /api/auth/register | Register new company |
 | POST | /api/auth/[...nextauth] | Login (NextAuth) |
-| POST | /api/auth/forgot-password | Request password reset |
-| POST | /api/auth/reset-password | Reset password with token |
 | GET/POST | /api/employees | List/create employees |
 | GET/PATCH/DELETE | /api/employees/[id] | Single employee CRUD |
 | POST | /api/attendance | Clock in/out, break start/end |

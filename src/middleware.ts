@@ -5,7 +5,11 @@ const secret = process.env.NEXTAUTH_SECRET;
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
-  const token = await getToken({ req, secret });
+  const token = await getToken({
+    req,
+    secret,
+    secureCookie: req.nextUrl.protocol === "https:" || process.env.VERCEL === "1",
+  });
 
   if (
     (pathname.startsWith("/api/admin") || pathname.startsWith("/admin")) &&
@@ -45,6 +49,7 @@ export const config = {
     "/api/shifts/:path*",
     "/api/leave/:path*",
     "/api/admin/:path*",
+    "/admin",
     "/admin/:path*",
   ],
 };

@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
 }
 
 enum UserRole {
@@ -82,6 +82,7 @@ model Company {
   logo           String?
   website        String?
   size           Int            @default(0)
+  gpsGraceZone   Int            @default(10)
   status         CompanyStatus  @default(ACTIVE)
   lastActivityAt DateTime?
   createdAt      DateTime       @default(now())
@@ -94,9 +95,11 @@ model Company {
   departments  Department[]
   branches     Branch[]
   employees    Employee[]
-  shifts       Shift[]
-  attendance   Attendance[]
-  leaveRequests LeaveRequest[]
+   shifts       Shift[]
+   attendance   Attendance[]
+   leaveRequests LeaveRequest[]
+   devices      BiometricDevice[]
+   employeeDevices EmployeeDevice[]
 
   @@index([slug])
   @@index([planId])
@@ -117,6 +120,8 @@ model Plan {
   maxDepartments Int      @default(5)
   qrAttendance   Boolean  @default(false)
   gpsAttendance  Boolean  @default(false)
+  mobileFingerprint Boolean @default(false)
+  biometricDevices Int    @default(0)
   aiFeatures     Boolean  @default(false)
   apiAccess      Boolean  @default(false)
   prioritySupport Boolean @default(false)
@@ -208,6 +213,7 @@ model Branch {
 
   employees Employee[]
   shifts    Shift[]
+  devices   BiometricDevice[]
 
   @@unique([companyId, name])
   @@index([companyId])
@@ -238,6 +244,8 @@ model Employee {
   user      User?
   attendance Attendance[]
   leaveRequests LeaveRequest[]
+  deviceEnrollments EmployeeDevice[]
+  credentials EmployeeCredential[]
 
   @@unique([companyId, employeeCode])
   @@index([companyId])
@@ -356,6 +364,68 @@ model ApiKey {
 
   @@index([companyId])
   @@index([key])
+}
+
+model BiometricDevice {
+  id            String   @id @default(cuid())
+  name          String
+  model         String?
+  serialNumber  String?
+  ipAddress     String?
+  port          Int      @default(4370)
+  location      String?
+  status        String   @default("online")
+  lastSyncAt    DateTime?
+  companyId     String
+  company       Company  @relation(fields: [companyId], references: [id])
+  branchId      String?
+  branch        Branch?  @relation(fields: [branchId], references: [id])
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  employeeDevices EmployeeDevice[]
+
+  @@unique([companyId, name])
+  @@index([companyId])
+  @@index([branchId])
+}
+
+model EmployeeDevice {
+  id              String   @id @default(cuid())
+  deviceUserId    String?
+  enrollmentStatus String  @default("pending")
+  enrolledAt      DateTime?
+  lastVerifiedAt  DateTime?
+  employeeId      String
+  employee        Employee @relation(fields: [employeeId], references: [id])
+  deviceId        String
+  device          BiometricDevice @relation(fields: [deviceId], references: [id])
+  companyId       String
+  company         Company @relation(fields: [companyId], references: [id])
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([employeeId, deviceId])
+  @@index([employeeId])
+  @@index([deviceId])
+  @@index([companyId])
+}
+
+model EmployeeCredential {
+  id            String   @id
+  publicKey     Bytes
+  counter       BigInt   @default(0)
+  deviceType    String
+  backedUp      Boolean  @default(false)
+  transports    String[]
+  employeeId    String
+  employee      Employee @relation(fields: [employeeId], references: [id])
+  companyId     String
+  company       Company  @relation(fields: [companyId], references: [id])
+  createdAt     DateTime @default(now())
+
+  @@index([employeeId])
+  @@index([companyId])
 }
 
 model Notification {

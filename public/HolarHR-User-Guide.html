@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HolarHR - User Guide</title>
+<style>
+  @page { margin: 2cm; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    color: #1a1a2e;
+    line-height: 1.7;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 40px 24px;
+  }
+  h1 { font-size: 32px; color: #1e40af; border-bottom: 3px solid #1e40af; padding-bottom: 12px; margin-bottom: 8px; }
+  .subtitle { font-size: 16px; color: #64748b; margin-bottom: 32px; }
+  h2 {
+    font-size: 22px; color: #1e40af; margin-top: 36px; margin-bottom: 16px;
+    padding-left: 12px; border-left: 4px solid #3b82f6;
+  }
+  h3 { font-size: 17px; color: #334155; margin-top: 20px; margin-bottom: 8px; }
+  p { margin-bottom: 12px; color: #334155; }
+  ul, ol { margin: 8px 0 16px 24px; }
+  li { margin-bottom: 6px; color: #334155; }
+  strong { color: #1e293b; }
+  code {
+    background: #f1f5f9; padding: 2px 8px; border-radius: 4px;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 14px; color: #0f172a;
+  }
+  .tag {
+    display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px;
+    border-radius: 10px; margin-left: 6px; text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .tag-free { background: #e2e8f0; color: #475569; }
+  .tag-starter { background: #dbeafe; color: #1d4ed8; }
+  .tag-business { background: #fef3c7; color: #b45309; }
+  .tag-enterprise { background: #ede9fe; color: #6d28d9; }
+  .card {
+    background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px;
+    padding: 20px 24px; margin: 16px 0;
+  }
+  .card h3 { margin-top: 0; }
+  .table-wrap { overflow-x: auto; margin: 16px 0; }
+  table {
+    width: 100%; border-collapse: collapse; font-size: 14px;
+  }
+  th {
+    background: #1e40af; color: white; padding: 10px 14px; text-align: left; font-weight: 600;
+  }
+  td { padding: 10px 14px; border-bottom: 1px solid #e2e8f0; }
+  tr:nth-child(even) td { background: #f8fafc; }
+  .step { margin: 16px 0; padding: 0; list-style: none; counter-reset: step; }
+  .step li {
+    counter-increment: step; padding: 12px 16px 12px 48px; position: relative;
+    border-left: 3px solid #3b82f6; margin-bottom: 8px; list-style: none;
+  }
+  .step li::before {
+    content: counter(step); position: absolute; left: -14px; top: 12px;
+    width: 28px; height: 28px; border-radius: 50%; background: #3b82f6;
+    color: white; font-weight: 700; font-size: 14px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .feature-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px; margin: 12px 0;
+  }
+  .feature-item {
+    background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;
+    padding: 14px 16px; font-size: 14px;
+  }
+  .feature-item strong { display: block; margin-bottom: 4px; font-size: 15px; }
+  .feature-item .plans { font-size: 12px; color: #64748b; margin-top: 6px; }
+  @media print {
+    body { padding: 0; }
+    .card { break-inside: avoid; }
+    h2 { break-after: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<h1>HolarHR</h1>
+<p class="subtitle">Enterprise Workforce Attendance SaaS — User Guide</p>
+
+<div class="card" style="background:#eff6ff;border-color:#93c5fd;">
+  <p style="margin:0"><strong>Deployed at:</strong> <code>https://holarhrattendance.vercel.app</code></p>
+</div>
+
+<!-- ============================== -->
+<h2>1. Overview</h2>
+<p>
+HolarHR is a multi-tenant workforce attendance and management platform. It serves
+organizations of all sizes — from small teams to large enterprises — with role-based
+access control, shift tracking, leave management, attendance reporting, AI-powered
+insights, and billing integration with Stripe &amp; Paystack.
+</p>
+
+<!-- ============================== -->
+<h2>2. Features by Plan</h2>
+
+<div class="table-wrap">
+<table>
+  <thead>
+    <tr><th>Feature</th><th>Free</th><th>Starter</th><th>Business</th><th>Enterprise</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Max Employees</td><td>3</td><td>25</td><td>250</td><td>99,999</td></tr>
+    <tr><td>Max Branches</td><td>1</td><td>2</td><td>10</td><td>999</td></tr>
+    <tr><td>Max Departments</td><td>5</td><td>10</td><td>25</td><td>999</td></tr>
+    <tr><td>QR Attendance</td><td>—</td><td>—</td><td>✓</td><td>✓</td></tr>
+    <tr><td>GPS Attendance</td><td>—</td><td>—</td><td>✓</td><td>✓</td></tr>
+    <tr><td>AI Insights</td><td>—</td><td>—</td><td>—</td><td>✓</td></tr>
+    <tr><td>API Access</td><td>—</td><td>—</td><td>✓</td><td>✓</td></tr>
+    <tr><td>Priority Support</td><td>—</td><td>—</td><td>—</td><td>✓</td></tr>
+    <tr><td>Reports</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td></tr>
+    <tr><td>Price (USD/mo)</td><td>$0</td><td>$29</td><td>$99</td><td>$299</td></tr>
+  </tbody>
+</table>
+</div>
+
+<!-- ============================== -->
+<h2>3. All Features</h2>
+
+<div class="feature-grid">
+  <div class="feature-item">
+    <strong>Multi-Tenant Architecture</strong>
+    Each company gets an isolated workspace with its own employees, departments, branches, and data.
+  </div>
+  <div class="feature-item">
+    <strong>Role-Based Access Control</strong>
+    Five roles: SUPER_ADMIN, COMPANY_ADMIN, HR_MANAGER, DEPARTMENT_MANAGER, EMPLOYEE. Granular permissions per page and API.
+  </div>
+  <div class="feature-item">
+    <strong>Attendance Tracking</strong>
+    Clock in / clock out with late detection, shift-based calculations, early clock-out reason required. Daily unique constraint per employee.
+  </div>
+  <div class="feature-item">
+    <strong>Break Management</strong>
+    Track lunch and other breaks during the workday. Duration auto-calculated.
+  </div>
+  <div class="feature-item">
+    <strong>Shift Management</strong>
+    Configure morning, evening, or custom shifts with grace periods, working hours, and branch association.
+  </div>
+  <div class="feature-item">
+    <strong>Leave Management</strong>
+    Submit leave requests (Sick, Annual, Personal, Maternity, Paternity, Other). Approval workflow by managers. Notifications on submission.
+  </div>
+  <div class="feature-item">
+    <strong>Reporting &amp; Analytics</strong>
+    Daily, weekly, monthly summaries. Filter by department or branch. EMPLOYEE role sees own records only.
+  </div>
+  <div class="feature-item">
+    <strong>AI-Powered Insights</strong>
+    <span class="tag tag-enterprise">Enterprise</span>
+    Natural-language HR chat and attendance insight generation via OpenAI.
+  </div>
+  <div class="feature-item">
+    <strong>Departments &amp; Branches</strong>
+    Organize your workforce by department (Engineering, HR, Marketing, etc.) and branch (HQ, remote offices).
+  </div>
+  <div class="feature-item">
+    <strong>Employee Management</strong>
+    Full CRUD with plan limit enforcement, search, filtering. Employee creation auto-generates a user account with a temporary password.
+  </div>
+  <div class="feature-item">
+    <strong>Notifications</strong>
+    Real-time (10s polling) notification bell with unread badge. Automatic notifications on leave requests and other events.
+  </div>
+  <div class="feature-item">
+    <strong>Password Management</strong>
+    Forgot password flow with reset token. Admin/HR can reset employee passwords from the employee list (temp password shown via toast).
+  </div>
+  <div class="feature-item">
+    <strong>Billing (Stripe)</strong>
+    Checkout, webhook, customer portal. Plans synced with Stripe price IDs.
+  </div>
+  <div class="feature-item">
+    <strong>Billing (Paystack)</strong>
+    Alternative payment provider for NGN currency. Mock mode available for local development.
+  </div>
+  <div class="feature-item">
+    <strong>Company Settings</strong>
+    Company profile, logo upload (max 400KB, PNG/JPG/SVG), plan management.
+  </div>
+  <div class="feature-item">
+    <strong>Profile Page</strong>
+    Personal details edit and password change from a dedicated profile page.
+  </div>
+  <div class="feature-item">
+    <strong>Admin Panel</strong>
+    <span class="tag tag-enterprise">SUPER_ADMIN</span>
+    Full system overview: manage tenants (companies), users, view plan distribution and stats.
+  </div>
+  <div class="feature-item">
+    <strong>Inactivity Cron</strong>
+    Automated company lifecycle: 3mo inactive → marked INACTIVE, 6mo → warning, 12mo → scheduled deletion.
+  </div>
+  <div class="feature-item">
+    <strong>Marketing Landing Page</strong>
+    Public-facing site with Home, Features, Pricing, About, Contact sections.
+  </div>
+  <div class="feature-item">
+    <strong>Responsive UI</strong>
+    Mobile-friendly sidebar with hamburger toggle, accessible on all screen sizes.
+  </div>
+  <div class="feature-item">
+    <strong>Security</strong>
+    JWT sessions, RBAC on all API routes, middleware protection, secure password hashing (bcryptjs).
+  </div>
+</div>
+
+<!-- ============================== -->
+<h2>4. Test Accounts</h2>
+
+<p>All accounts use the password <code>password123</code>.</p>
+
+<div class="table-wrap">
+<table>
+  <thead>
+    <tr><th>Email</th><th>Role</th><th>Access</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>admin@holarhr.com</code></td><td>SUPER_ADMIN</td><td>Full system access + /admin panel</td></tr>
+    <tr><td><code>admin@acme.com</code></td><td>COMPANY_ADMIN</td><td>Acme Corp company owner — all settings, billing</td></tr>
+    <tr><td><code>hr@acme.com</code></td><td>HR_MANAGER</td><td>Employee management, attendance, reports, AI</td></tr>
+    <tr><td><code>manager@acme.com</code></td><td>DEPARTMENT_MANAGER</td><td>Department oversight, attendance, reports</td></tr>
+    <tr><td><code>john@acme.com</code></td><td>EMPLOYEE</td><td>Self-service: own attendance, reports, leave</td></tr>
+  </tbody>
+</table>
+</div>
+
+<!-- ============================== -->
+<h2>5. Getting Started — After Sign Up</h2>
+
+<p>Follow these steps after registering your company account:</p>
+
+<ol class="step">
+  <li>
+    <strong>Log In</strong><br>
+    Go to <code>https://holarhrattendance.vercel.app/login</code> and sign in with your email and password.
+    Use one of the test accounts above, or register a new company at <code>/register</code>.
+  </li>
+  <li>
+    <strong>Complete Your Company Profile</strong><br>
+    Navigate to <strong>Settings</strong> → update company name, email, phone, address.
+    Upload your company logo (PNG/JPG/SVG, max 400KB).
+  </li>
+  <li>
+    <strong>Create Departments</strong><br>
+    Go to <strong>Departments</strong> → click <strong>Add Department</strong>.
+    Create departments like Engineering, Human Resources, Marketing, Sales, etc.
+  </li>
+  <li>
+    <strong>Create Branches</strong><br>
+    Go to <strong>Branches</strong> → click <strong>Add Branch</strong>.
+    Add your office locations (Headquarters, Branch Office, etc.).
+  </li>
+  <li>
+    <strong>Define Shifts</strong><br>
+    Go to <strong>Shifts</strong> → click <strong>Add Shift</strong>.
+    Set shift name, start/end time, grace period (minutes), and optionally assign to a branch.
+    Example: Morning 08:00–17:00, grace 15 min.
+  </li>
+  <li>
+    <strong>Add Employees</strong><br>
+    Go to <strong>Employees</strong> → click <strong>Add Employee</strong>.
+    Fill in employee details (first name, last name, email, phone, position, salary).
+    Assign them to a Department, Branch, and Shift.
+    A user account is automatically created with a temporary password.
+  </li>
+  <li>
+    <strong>Manage Attendance</strong><br>
+    Go to <strong>Attendance</strong> → click <strong>Clock In</strong> to start tracking.
+    Use <strong>Clock Out</strong> at the end of the day (early clock-out requires a reason).
+    View attendance status (Present, Late, Absent, Half-day, Leave) in the dashboard.
+  </li>
+  <li>
+    <strong>Submit &amp; Approve Leave</strong><br>
+    Employees: Go to <strong>Leave</strong> → <strong>Request Leave</strong> → select type, dates, reason.
+    Managers: Approve or reject pending requests. Notifications are sent automatically.
+  </li>
+  <li>
+    <strong>View Reports</strong><br>
+    Go to <strong>Reports</strong> to see daily, weekly, and monthly attendance summaries.
+    Filter by department or branch (HR and above).
+  </li>
+  <li>
+    <strong>Explore AI Insights</strong>
+    <span class="tag tag-enterprise">Enterprise</span><br>
+    <strong>Enterprise plan only</strong>. Go to <strong>AI Insights</strong> to ask natural-language
+    questions about your workforce data or use the HR chat assistant.
+  </li>
+  <li>
+    <strong>Manage Billing</strong><br>
+    Go to <strong>Billing</strong> to view your current plan, upgrade via Stripe or Paystack,
+    or access the customer portal.
+  </li>
+  <li>
+    <strong>Profile &amp; Settings</strong><br>
+    Click your avatar (top-right) → <strong>Profile</strong> to edit personal details or change password.
+    Use <strong>Sign Out</strong> from the same menu when done.
+  </li>
+</ol>
+
+<div class="card" style="background:#fef2f2;border-color:#fca5a5;">
+  <p style="margin:0;font-size:14px;">
+    <strong>Note for SUPER_ADMIN:</strong> After logging in as <code>admin@holarhr.com</code>,
+    click <strong>Admin Panel</strong> in the sidebar to access the system-wide admin dashboard
+    where you can manage all companies (<strong>Tenants</strong>), view all users, and see system statistics.
+  </p>
+</div>
+
+<!-- ============================== -->
+<h2>6. Role Permissions</h2>
+
+<div class="table-wrap">
+<table>
+  <thead>
+    <tr><th>Permission</th><th>SUPER_ADMIN</th><th>COMPANY_ADMIN</th><th>HR_MANAGER</th><th>DEPT_MANAGER</th><th>EMPLOYEE</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>View Dashboard</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td></tr>
+    <tr><td>Manage Employees</td><td>✓</td><td>✓</td><td>✓</td><td>—</td><td>—</td></tr>
+    <tr><td>Manage Departments</td><td>✓</td><td>✓</td><td>✓</td><td>—</td><td>—</td></tr>
+    <tr><td>Manage Branches</td><td>✓</td><td>✓</td><td>✓</td><td>—</td><td>—</td></tr>
+    <tr><td>Manage Shifts</td><td>✓</td><td>✓</td><td>✓</td><td>—</td><td>—</td></tr>
+    <tr><td>View Reports (all)</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>—</td></tr>
+    <tr><td>View Own Reports</td><td>—</td><td>—</td><td>—</td><td>—</td><td>✓</td></tr>
+    <tr><td>Approve Leave</td><td>✓</td><td>✓</td><td>✓</td><td>—</td><td>—</td></tr>
+    <tr><td>Request Leave</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td></tr>
+    <tr><td>Clock In/Out</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td></tr>
+    <tr><td>AI Insights</td><td>✓</td><td>✓</td><td>✓</td><td>—</td><td>—</td></tr>
+    <tr><td>Billing</td><td>✓</td><td>✓</td><td>—</td><td>—</td><td>—</td></tr>
+    <tr><td>Company Settings</td><td>✓</td><td>✓</td><td>—</td><td>—</td><td>—</td></tr>
+    <tr><td>Admin Panel</td><td>✓</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+  </tbody>
+</table>
+</div>
+
+<!-- ============================== -->
+<h2>7. Page Directory</h2>
+
+<div class="table-wrap">
+<table>
+  <thead>
+    <tr><th>Page</th><th>URL</th><th>Description</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Home / Landing</td><td><code>/</code></td><td>Marketing site with Features, Pricing, About, Contact</td></tr>
+    <tr><td>Login</td><td><code>/login</code></td><td>Sign in with email and password</td></tr>
+    <tr><td>Register</td><td><code>/register</code></td><td>Create a new company account</td></tr>
+    <tr><td>Forgot Password</td><td><code>/forgot-password</code></td><td>Request password reset link</td></tr>
+    <tr><td>Dashboard</td><td><code>/dashboard</code></td><td>Main overview with attendance summary</td></tr>
+    <tr><td>Attendance</td><td><code>/attendance</code></td><td>Clock in/out, view attendance history</td></tr>
+    <tr><td>Attendance Status</td><td><code>/attendance/status</code></td><td>Today's attendance status</td></tr>
+    <tr><td>Employees</td><td><code>/employees</code></td><td>Manage employees (HR+)</td></tr>
+    <tr><td>Departments</td><td><code>/departments</code></td><td>Manage departments (HR+)</td></tr>
+    <tr><td>Branches</td><td><code>/branches</code></td><td>Manage branches (HR+)</td></tr>
+    <tr><td>Shifts</td><td><code>/shifts</code></td><td>Manage shifts (HR+)</td></tr>
+    <tr><td>Leave</td><td><code>/leave</code></td><td>Submit and manage leave requests</td></tr>
+    <tr><td>Reports</td><td><code>/reports</code></td><td>Attendance reports and summaries</td></tr>
+    <tr><td>AI Insights</td><td><code>/ai</code></td><td>AI-powered HR chat (Enterprise)</td></tr>
+    <tr><td>Billing</td><td><code>/billing</code></td><td>Plan, payments, invoices (Admin)</td></tr>
+    <tr><td>Settings</td><td><code>/settings</code></td><td>Company profile and logo (Admin)</td></tr>
+    <tr><td>Profile</td><td><code>/profile</code></td><td>Personal details and password change</td></tr>
+    <tr><td>Admin Panel</td><td><code>/admin</code></td><td>System dashboard (SUPER_ADMIN)</td></tr>
+    <tr><td>Admin Tenants</td><td><code>/admin/tenants</code></td><td>Manage all companies (SUPER_ADMIN)</td></tr>
+    <tr><td>Admin Users</td><td><code>/admin/users</code></td><td>View all users (SUPER_ADMIN)</td></tr>
+  </tbody>
+</table>
+</div>
+
+<!-- ============================== -->
+<h2>8. Key Concepts</h2>
+
+<div class="card">
+  <h3>Multi-Tenant</h3>
+  <p>
+    Each registered company is a separate <strong>tenant</strong> with its own isolated data.
+    Users, employees, departments, branches, shifts, attendance records, and leave requests
+    are scoped to a single company. A SUPER_ADMIN can oversee all tenants via the Admin Panel.
+  </p>
+</div>
+
+<div class="card">
+  <h3>Employee ↔ User Relationship</h3>
+  <p>
+    When an HR manager creates an Employee record, a corresponding User account is automatically
+    generated with a temporary password. The User enables login; the Employee holds HR data
+    (position, salary, department, etc.). They are linked via <code>employeeId</code>.
+  </p>
+</div>
+
+<div class="card">
+  <h3>Attendance Rules</h3>
+  <p>
+    An employee can have at most one attendance record per day (enforced by unique constraint on
+    <code>employeeId + date</code>). Clocking out early requires a mandatory reason.
+    Late arrival is calculated against the assigned shift's start time plus grace period.
+  </p>
+</div>
+
+<div class="card">
+  <h3>Notifications</h3>
+  <p>
+    Notifications are created server-side (currently on leave request submission).
+    The bell icon in the navbar polls every 10 seconds for new notifications.
+    Unread count shows as a badge. Clicking a notification marks it as read.
+  </p>
+</div>
+
+<div class="card">
+  <h3>Billing Providers</h3>
+  <p>
+    Two payment providers are integrated: <strong>Stripe</strong> (USD, global) and
+    <strong>Paystack</strong> (NGN, Nigeria). Paystack has a mock mode for development
+    (<code>PAYSTACK_MOCK=true</code>). Billing is configurable per plan.
+  </p>
+</div>
+
+<div style="margin-top:48px;padding-top:24px;border-top:1px solid #e2e8f0;text-align:center;color:#94a3b8;font-size:13px;">
+  HolarHR — Enterprise Workforce Attendance SaaS &bull; Document generated July 2026
+</div>
+
+</body>
+</html>

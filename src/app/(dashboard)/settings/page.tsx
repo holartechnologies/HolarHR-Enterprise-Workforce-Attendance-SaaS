@@ -24,13 +24,15 @@ export default function SettingsPage() {
     e.preventDefault();
     setSaving(true);
     const form = new FormData(e.currentTarget);
-    const data = {
+    const data: Record<string, unknown> = {
       name: form.get("name"),
       email: form.get("email"),
       phone: form.get("phone"),
       address: form.get("address"),
       website: form.get("website"),
     };
+    const graceZone = form.get("gpsGraceZone");
+    if (graceZone) data.gpsGraceZone = Number(graceZone);
 
     try {
       const res = await fetch("/api/settings", {
@@ -95,6 +97,16 @@ export default function SettingsPage() {
             <div className="space-y-2 md:col-span-2">
               <label className="text-sm font-medium">Address</label>
               <Input name="address" defaultValue={company?.address as string || ""} />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">GPS Grace Zone (meters)</label>
+              <Input
+                name="gpsGraceZone"
+                type="number"
+                min="0"
+                defaultValue={company?.gpsGraceZone != null ? Number(company.gpsGraceZone) : 10}
+              />
+              <p className="text-xs text-muted-foreground">How far outside the geofence employees can still clock in (0 = strict, recommended: 10-50m)</p>
             </div>
             <div className="md:col-span-2">
               <Button type="submit" disabled={saving}>{saving ? "Saving..." : "Save Changes"}</Button>

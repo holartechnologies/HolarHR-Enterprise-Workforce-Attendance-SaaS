@@ -2,6 +2,8 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSessionUser, unauthorized, ok, badRequest, serverError, validatePagination } from "@/lib/api-utils";
 import { hasPermission } from "@/lib/rbac";
+import { hasFeature } from "@/lib/plans";
+import { isWithinRadius, haversineDistance } from "@/lib/geo";
 import { startOfDay, endOfDay } from "date-fns";
 import { createAuditLog } from "@/lib/audit";
 
@@ -86,6 +88,8 @@ export async function POST(req: NextRequest) {
     let employeeId = bodyEmployeeId || user.employeeId;
     if (!employeeId) return badRequest("Employee ID required - no employee linked to your account");
 
+    let gpsWarning: string | null = null;
+
     const employee = await prisma.employee.findFirst({
       where: { id: employeeId, companyId: user.companyId, status: "ACTIVE" },
       include: { shift: true },
@@ -113,6 +117,41 @@ export async function POST(req: NextRequest) {
 
       if (existingRecord?.clockOut) {
         return badRequest("Already completed for today");
+      }
+
+      if (latitude != null && longitude != null) {
+        const gpsPlanCheck = await prisma.company.findUnique({
+          where: { id: user.companyId },
+          include: { plan: true },
+        });
+
+        const graceZone = gpsPlanCheck?.gpsGraceZone ?? 10;
+
+        if (gpsPlanCheck?.plan && hasFeature(gpsPlanCheck.plan.name, "gpsAttendance")) {
+          if (employee.branchId) {
+            const branch = await prisma.branch.findUnique({
+              where: { id: employee.branchId },
+            });
+
+            if (branch?.latitude != null && branch?.longitude != null) {
+              const dist = haversineDistance(
+                latitude, longitude,
+                branch.latitude, branch.longitude
+              );
+              const outsideBy = dist - branch.radius;
+
+              if (outsideBy > graceZone) {
+                return badRequest(
+                  `You are ${Math.round(dist)}m from "${branch.name}" (geofence: ${branch.radius}m, grace: ${graceZone}m, you are ${Math.round(outsideBy)}m outside). Move closer to clock in.`
+                );
+              }
+
+              if (outsideBy > 0) {
+                gpsWarning = `You are ${Math.round(dist)}m from "${branch.name}" — ${Math.round(outsideBy)}m outside the ${branch.radius}m geofence. Grace zone: ${graceZone}m. Clock-in recorded with proximity warning.`;
+              }
+            }
+          }
+        }
       }
 
       let lateMinutes = 0;
@@ -148,7 +187,7 @@ export async function POST(req: NextRequest) {
         companyId: user.companyId,
       });
 
-      return ok(record, "Clocked in successfully");
+      return ok({ ...record, gpsWarning }, gpsWarning || "Clocked in successfully");
     }
 
     if (type === "clock_out") {

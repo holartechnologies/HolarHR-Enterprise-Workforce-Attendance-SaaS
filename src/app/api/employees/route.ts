@@ -43,6 +43,7 @@ export async function GET(req: NextRequest) {
           department: { select: { id: true, name: true } },
           branch: { select: { id: true, name: true } },
           shift: { select: { id: true, name: true } },
+          _count: { select: { deviceEnrollments: true } },
         },
         orderBy: { createdAt: "desc" },
         skip,
